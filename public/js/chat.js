@@ -7,6 +7,8 @@ const $messageFormButton = $messageForm.querySelector('button');
 const $sendLocationButton = document.querySelector('#send-location');
 const $messages = document.querySelector('#messages');
 
+const $roomListButton = document.querySelector('#getRooms')
+
 // Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML;
 const locationTemplate = document.querySelector('#location-message-template').innerHTML;
@@ -58,11 +60,16 @@ socket.on('locationMessage', (message) => {
 });
 
 socket.on('roomData', ({ room, users }) => {
+    room = room.charAt(0).toUpperCase() + room.slice(1);
     const html = Mustache.render(sidebarTemplate, {
-        room,
+        room: room,
         users
     });
     document.querySelector('#sidebar').innerHTML = html
+})
+
+socket.on('sendRooms', (rooms) => {
+    console.log(rooms);
 })
 
 $messageForm.addEventListener('submit', (e) => {

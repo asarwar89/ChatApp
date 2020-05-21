@@ -4,7 +4,7 @@ const express = require('express');
 const socketio = require('socket.io');
 const Filter = require('bad-words');
 const { generateMessage, generateLocationMessage } = require('./utils/messages');
-const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/users');
+const { addUser, removeUser, getUser, getUsersInRoom, getRooms } = require('./utils/users');
 
 const app = express();
 const server = http.createServer(app);
@@ -43,7 +43,6 @@ io.on('connection', (socket) => {
     })
 
     socket.on('sendMessage', (text, callback) => {
-
         const user = getUser(socket.id);
         const filter = new Filter();
 
@@ -56,10 +55,15 @@ io.on('connection', (socket) => {
     });
 
     socket.on('sendLocation',(coords, callback) => {
-
         const user = getUser(socket.id);
 
         io.to(user.room).emit('locationMessage', generateLocationMessage(user.username, `https://google.com/maps?q=${coords.latitude},${coords.longitude}`));
+        callback();
+    });
+
+    socket.on('sendRoomList', (callback) => {
+        const rooms = getRooms();
+        io.emit('roomList', rooms);
         callback();
     })
 
